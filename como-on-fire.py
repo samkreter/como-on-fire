@@ -56,7 +56,7 @@ for node in tree.iter('item'):
     for truck in trucks:
       session.run("""MATCH(item:Item {id: {in_id}})
                      MERGE (truck:Truck {id: {truck}})
-                     MERGE (truck)-[:Dispatch]->(item)""",{'truck':truck})
+                     MERGE (truck)-[:Dispatch]->(item)""",{'truck':truck,'in_id':in_id})
 
 
 
