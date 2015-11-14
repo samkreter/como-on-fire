@@ -45,6 +45,16 @@
             "Cities": cities
         };
 
+        var geojsonMarkerOptions = {
+          radius: 8,
+          fillColor: "#ff7800",
+          color: "#000",
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.8
+        };
+
+
         function onEachFeature(feature, layer) {
           // does this feature have a property named popupContent?
           if (feature.properties && feature.properties.popupContent) {
@@ -57,18 +67,27 @@
         }
 
         function setWindow( startTimestamp, endTimestamp ) {
-
+            // loop through each of the global map layers
+            // looking for each geoJson layer
+            map.eachLayer(function (layer) {
+              // get access to the
+              if (layer.feature) {
+                var tempTimestamp = layer.feature.properties.timestamp;
+                // do a if check to verify within timestamp bounds
+              }
+            });
         }
 
         // Called whenever something happens in town
         function onCityEvent( event ) {
-          console.log("DID WE CALL THIS")
+          //console.log("DID WE CALL THIS")
           var geojsonFeature = {
         	   "type": "Feature",
         	         "properties": {
         		       "name": event.title,
         		       "popupContent": event.desc,
-                   "show_on_map" : true
+                   "show_on_map" : true,
+                   "timestamp" : event.timestamp
         	         },
         	  "geometry": {
         		    "type": "Point",
@@ -76,20 +95,14 @@
         	  }
           }
 
-          console.log( geojsonFeature.geometry.coordinates, event );
-          //console.log(geojsonFeature)
+          //console.log( geojsonFeature.geometry.coordinates, event );
+
 
           L.geoJson(geojsonFeature, {
               onEachFeature: onEachFeature,
               filter: function(feature, layer) {
                 return feature.properties.show_on_map;
-              },
-              style: function(feature) {
-                switch (feature.properties.name) {
-                case 'Motor Vehicle Collision': return {color: "#ff0000"};
-                default : return {color: "#0000ff"};
               }
-            }
           }).addTo(map);
 
           //L.geoJson(geojsonFeature).addTo(map)
