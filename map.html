@@ -12,9 +12,12 @@
 </head>
 <body>
     <div id="map" style="width: 100%; height: 80%"></div>
+    <input type="range" min="-172800" max="0" value="0" id="fader" step="60" oninput="updateRange(value)">
+    <p>Showing events around <span id="range-details"></span></p>
 
     <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
     <script src="neo4j-web.js"></script>
+    <script src="moment.min.js"></script>
 
     <script>
         var cities = new L.LayerGroup();
@@ -50,6 +53,7 @@
         }
 
         function setEvents( events ) {
+            console.log( events );
             events.forEach(onCityEvent);
         }
 
@@ -71,6 +75,8 @@
         		    "coordinates": [event.geolong, event.geolat]
         	  }
           }
+
+          console.log( geojsonFeature.geometry.coordinates, event );
           //console.log(geojsonFeature)
 
           L.geoJson(geojsonFeature, {
@@ -83,8 +89,19 @@
 
         L.control.layers(baseLayers, overlays).addTo(map);
 
-
-
+        // Time window to show on each side of the selected time on the slider, seconds
+        var WINDOW_SIZE = 60 * 15 * 1000;
+        /** Called whenever the slider is moved by the user */
+        function updateRange(delta) {
+            var center = Date.now() + parseInt(delta) * 1000,
+                start = center - WINDOW_SIZE,
+                end = center - WINDOW_SIZE;
+            
+            setTimeout( function() {
+              document.querySelector("#range-details").innerHTML = moment( end ).calendar();
+            }, 0);
+            setWindow( start, end );
+        }
 
     </script>
 
@@ -98,7 +115,9 @@
         var events = [];
         session.run("MATCH (n:Item) RETURN n ORDER BY n.timestamp DESC").subscribe( {
             onNext:function( record ) {
-                events.push( record.n.properties );
+                if( !neo4j.isInt( record.n.properties ) ) {
+                    events.push( record.n.properties );
+                }
             },
             onCompleted: function() {
                 setEvents( events );    
