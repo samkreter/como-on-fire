@@ -96,28 +96,28 @@ for node in treeEMS.iter('item'):
         emergencyType = getEmergencyType(truck)
         session.run("""MATCH(item:Item {id: {in_id}})
                      MERGE (truck:Truck {id: {truck}})
-                     set truck.type={truckType}
+                     set truck.type={truckType},
                          truck.emergencyType={emergencyType}
                      MERGE (truck)-[:Dispatch]->(item)
                      """,{'truck':truck,'truckType':truckType,'in_id':in_id,'emergencyType':emergencyType})
 
 for node in treePolice.find_all('item'):
     emergencyType = "Police"
-    pubDate = node.find('pubDate').text
+    pubDate = node.find('pubdate').text
     title = node.find('title').text
     desc = node.find('description').text
     geolat = float(node.find('geo:lat').text)
     geolong = float(node.find('geo:long').text)
-    callDateTime = node.find('calldata:CallDateTime').text
-    address = node.find('calldata:Address').text
-    aptLot = node.find('calldata:AptLot').text
-    displayName = node.find('calldata:ExtNatureDisplayName').text
-    in_id = node.find('calldata:InNum').text
-    timestamp = int(node.find('calldata:Timestamp').text)
-    callDatalat = float(node.find('calldata:Latitude').text)
-    callDatalong = float(node.find('calldata:Longitude').text)
-    gridLoc = node.find('calldata:GridLoc').text
-    disp = node.find('calldata:Disp').text
+    callDateTime = node.find('calldata:calldatetime').text
+    address = node.find('calldata:address').text
+    aptLot = node.find('calldata:aptlot').text
+    displayName = node.find('calldata:extnaturedisplayname').text
+    in_id = node.find('calldata:innum').text
+    timestamp = int(node.find('calldata:timestamp').text)
+    callDatalat = float(node.find('calldata:latitude').text)
+    callDatalong = float(node.find('calldata:longitude').text)
+    gridLoc = node.find('calldata:gridloc').text
+    disp = node.find('calldata:disp').text
     session.run("""MERGE (a:Item {id: {in_id}})
              set a.pubDate={pubDate},
                  a.emergencyType={emergencyType},
