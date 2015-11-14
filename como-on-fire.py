@@ -25,8 +25,6 @@ for node in tree.iter('item'):
     agency = node[12].text
     FDids = node[13].text
     trucks = node[14].text.split(" - ") if node[14].text is not None else " "
-    for truck in trucks:
-      session.run("MERGE (a:Truck {id: {truck}})",{'truck':truck})
     session.run("""MERGE (a:Item {id: {in_id}})
              set a.pubDate={pubDate},
                  a.title={title},
@@ -55,6 +53,11 @@ for node in tree.iter('item'):
                    'callDatalong':callDatalong,
                    'agency':agency,
                    'FDids':FDids})
+    for truck in trucks:
+      session.run("""MATCH(item:Item {id: {in_id}})
+                     MERGE (truck:Truck {id: {truck}})
+                     MERGE (truck)-[:Dispatch]->(item)""",{'truck':truck})
+
 
 
 
