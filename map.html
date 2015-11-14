@@ -2,15 +2,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Leaflet Layers Control Example</title>
+    <title>What's on fire?</title>
     <meta charset="utf-8" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div id="map" style="width: 1200px; height: 800px"></div>
+    <div id="map" style="width: 100%; height: 80%"></div>
 
     <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
     <script src="neo4j-web.js"></script>
@@ -18,19 +19,13 @@
     <script>
         var cities = new L.LayerGroup();
 
-        L.marker([39.61, -105.02]).bindPopup('This is Littleton, CO.').addTo(cities),
-        L.marker([39.74, -104.99]).bindPopup('This is Denver, CO.').addTo(cities),
-        L.marker([39.73, -104.8]).bindPopup('This is Aurora, CO.').addTo(cities),
-        L.marker([39.77, -105.23]).bindPopup('This is Golden, CO.').addTo(cities);
-
-
         var mbAttr = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
                 '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
                 'Imagery © <a href="http://mapbox.com">Mapbox</a>',
             mbUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6IjZjNmRjNzk3ZmE2MTcwOTEwMGY0MzU3YjUzOWFmNWZhIn0.Y8bhBaUMqFiPrDRW9hieoQ';
 
-        var grayscale   = L.tileLayer(mbUrl, {id: 'mapbox.light', attribution: mbAttr}),
-            streets  = L.tileLayer(mbUrl, {id: 'mapbox.streets',   attribution: mbAttr});
+        var grayscale = L.tileLayer(mbUrl, {id: 'mapbox.light', attribution: mbAttr}),
+            streets = L.tileLayer(mbUrl, {id: 'mapbox.streets',   attribution: mbAttr});
 
         var map = L.map('map', {
             center: [38.9540289, -92.3320246],
@@ -52,6 +47,14 @@
           if (feature.properties && feature.properties.popupContent) {
             layer.bindPopup(feature.properties.popupContent);
           }
+        }
+
+        function setEvents( events ) {
+            events.forEach(onCityEvent);
+        }
+
+        function setWindow( startTimestamp, endTimestamp ) {
+
         }
 
         // Called whenever something happens in town
@@ -80,6 +83,9 @@
 
         L.control.layers(baseLayers, overlays).addTo(map);
 
+
+
+
     </script>
 
     <script>
@@ -89,10 +95,14 @@
         var driver = neo4j.driver("neo4j://52.1.232.106");
         var session = driver.session();
 
-        session.run("MATCH (n:Item) RETURN n").subscribe( {
-            onNext:function( record ) { 
-                console.log( record.n.properties );
-                onCityEvent( record.n.properties );
+        var events = [];
+        session.run("MATCH (n:Item) RETURN n ORDER BY n.timestamp DESC").subscribe( {
+            onNext:function( record ) {
+                events.push( record.n.properties );
+            },
+            onCompleted: function() {
+                setEvents( events );    
+                setWindow( 0, 1542840729 );
             }
         }); 
     </script>
