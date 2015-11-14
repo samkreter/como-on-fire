@@ -9,6 +9,28 @@ result = urllib2.urlopen('https://www.gocolumbiamo.com/PSJC/Services/911/911disp
 tree = ElementTree.fromstring(result)
 
 
+def getTruckType(truck):
+    if truck[:2] == "SN":
+      return "Snozzle"
+    else if truck[0] == "S":
+      return "Squad"
+    else if truck[0] == "Q":
+      return "Quint"
+    else if truck[0] == "E":
+      return "Engine"
+    else if truck[0] == "L":
+      return "Ladder"
+    else if truck[0] == "M":
+      return "Medic"
+
+def getStationNum(truck):
+    digit = ""
+    for s in truck:
+        if s.isdigit():
+            digit += s
+    return int(digit)
+
+
 for node in tree.iter('item'):
     pubDate = node[0].text
     title = node[1].text
@@ -54,9 +76,15 @@ for node in tree.iter('item'):
                    'agency':agency,
                    'FDids':FDids})
     for truck in trucks:
-      session.run("""MATCH(item:Item {id: {in_id}})
+        truckType = getTruckType(truck)
+        truckStatNum = getStationNum(truck)
+        session.run("""MATCH(item:Item {id: {in_id}})
                      MERGE (truck:Truck {id: {truck}})
-                     MERGE (truck)-[:Dispatch]->(item)""",{'truck':truck})
+                     set truck.type={truckType}
+                     MERGE (truck)-[:Dispatch]->(item)
+                     MERGE (fireStation:FireStation {id:{truckStatNum}})
+                     MERGE (truck)-[:BelongsTo]->(fireStation)
+                     """,{'truck':truck,'truckType':truckType,'truckStatNum':truckStatNum})
 
 
 
