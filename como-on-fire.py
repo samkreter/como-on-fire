@@ -12,23 +12,25 @@ tree = ElementTree.fromstring(result)
 def getTruckType(truck):
     if truck[:2] == "SN":
       return "Snozzle"
-    else if truck[0] == "S":
+    elif truck[0] == "S":
       return "Squad"
-    else if truck[0] == "Q":
+    elif truck[0] == "Q":
       return "Quint"
-    else if truck[0] == "E":
+    elif truck[0] == "E":
       return "Engine"
-    else if truck[0] == "L":
+    elif truck[0] == "L":
       return "Ladder"
-    else if truck[0] == "M":
+    elif truck[0] == "M":
       return "Medic"
 
 def getStationNum(truck):
+    if truck == "" or truck is None:
+	return ""
     digit = ""
     for s in truck:
         if s.isdigit():
             digit += s
-    return int(digit)
+    return int(digit) if digit != "" else -1
 
 
 for node in tree.iter('item'):
@@ -84,7 +86,7 @@ for node in tree.iter('item'):
                      MERGE (truck)-[:Dispatch]->(item)
                      MERGE (fireStation:FireStation {id:{truckStatNum}})
                      MERGE (truck)-[:BelongsTo]->(fireStation)
-                     """,{'truck':truck,'truckType':truckType,'truckStatNum':truckStatNum})
+                     """,{'truck':truck,'in_id':in_id,'truckType':truckType,'truckStatNum':truckStatNum})
 
 
 
