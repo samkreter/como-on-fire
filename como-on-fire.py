@@ -13,7 +13,7 @@ resultPolice = urllib2.urlopen('https://www.gocolumbiamo.com/PSJC/Services/911/9
 treePolice = BeautifulSoup(resultPolice)
 
 
-def emergencyType(truck):
+def getEmergencyType(truck):
     if truck[0] == "M":
       return "Medical"
     else:
@@ -44,7 +44,7 @@ def getStationNum(truck):
 
 
 for node in treeEMS.iter('item'):
-    emergencyType = getEmergType(node[14])
+    emergencyMarker = "EMS"
     pubDate = node[0].text
     title = node[1].text
     desc = node[2].text
@@ -88,16 +88,18 @@ for node in treeEMS.iter('item'):
                    'callDatalat':callDatalat,
                    'callDatalong':callDatalong,
                    'agency':agency,
-                   'emergencyType':emergencyType,
+                   'emergencyType':emergencyMarker
                    'FDids':FDids})
     for truck in trucks:
         truckType = getTruckType(truck)
         truckStatNum = getStationNum(truck)
+        emergencyType = getEmergencyType(truck)
         session.run("""MATCH(item:Item {id: {in_id}})
                      MERGE (truck:Truck {id: {truck}})
                      set truck.type={truckType}
+                         truck.emergencyType={emergencyType}
                      MERGE (truck)-[:Dispatch]->(item)
-                     """,{'truck':truck,'in_id':in_id})
+                     """,{'truck':truck,'in_id':in_id,'emergencyType':emergencyType})
 
 for node in treePolice.find_all('item'):
     emergencyType = "Police"
