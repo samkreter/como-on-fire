@@ -1,6 +1,7 @@
 from xml.etree import ElementTree
 from neo4j import GraphDatabase, Node, Relationship, Path, CypherError
 import urllib2
+from bs4 import BeautifulSoup
 
 
 session = GraphDatabase.driver("bolt://localhost").session()
@@ -9,7 +10,7 @@ resultEMS = urllib2.urlopen('https://www.gocolumbiamo.com/PSJC/Services/911/911d
 treeEMS = ElementTree.fromstring(resultEMS)
 
 resultPolice = urllib2.urlopen('https://www.gocolumbiamo.com/PSJC/Services/911/911dispatch/police_georss.php').read()
-treePolice = ElementTree.fromstring(resultPolice)
+treePolice = BeautifulSoup(resultPolice)
 
 
 def emergencyType(truck):
@@ -98,23 +99,23 @@ for node in treeEMS.iter('item'):
                      MERGE (truck)-[:Dispatch]->(item)
                      """,{'truck':truck,'in_id':in_id})
 
-for node in treePolice.iter('item'):
+for node in treePolice.find_all('item'):
     emergencyType = "Police"
-    pubDate = node[0].text
-    title = node[1].text
-    desc = node[2].text
-    geolat = float(node[3].text)
-    geolong = float(node[4].text)
-    callDateTime = node[5].text
-    address = node[6].text
-    aptLot = node[7].text
-    displayName = node[8].text
-    in_id = node[9].text
-    timestamp = int(node[10].text)
-    callDatalat = float(node[11].text)
-    callDatalong = float(node[12].text)
-    gridLoc = node[13].text
-    disp = node[14].text
+    pubDate = node.find('pubDate').text
+    title = node.find('title').text
+    desc = node.find('description').text
+    geolat = float(node.find('geo:lat').text)
+    geolong = float(node.find('geo:long').text)
+    callDateTime = node.find('calldata:CallDateTime').text
+    address = node.find('calldata:Address').text
+    aptLot = node.find('calldata:AptLot').text
+    displayName = node.find('calldata:ExtNatureDisplayName').text
+    in_id = node.find('calldata:InNum').text
+    timestamp = int(node.find('calldata:Timestamp').text)
+    callDatalat = float(node.find('calldata:Latitude').text)
+    callDatalong = float(node.find('calldata:Longitude').text)
+    gridLoc = node.find('calldata:GridLoc').text
+    disp = node.find('calldata:Disp').text
     session.run("""MERGE (a:Item {id: {in_id}})
              set a.pubDate={pubDate},
                  a.emergencyType={emergencyType},
