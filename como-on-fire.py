@@ -1,13 +1,16 @@
 from xml.etree import ElementTree
 from neo4j import GraphDatabase, Node, Relationship, Path, CypherError
+import urllib2
 
-with open('podcasts.opml', 'rt') as f:
-    tree = ElementTree.parse(f)
 
-for node in tree.findall('.//outline'):
-    url = node.attrib.get('xmlUrl')
-    if url:
-        print url
+result = urllib2.urlopen('https://www.gocolumbiamo.com/PSJC/Services/911/911dispatch/fire_georss.php').read()
+tree = ElementTree.fromstring(result)
+	
+
+for node in tree.iter('item'):
+	print node[2].text  
+#url = node.attrib.get('xmlUrl')
+
 
 #session = GraphDatabase.driver("bolt://localhost").session()
 
