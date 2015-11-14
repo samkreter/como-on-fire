@@ -5,9 +5,18 @@ import urllib2
 
 session = GraphDatabase.driver("bolt://localhost").session()
 
-result = urllib2.urlopen('https://www.gocolumbiamo.com/PSJC/Services/911/911dispatch/fire_georss.php').read()
-tree = ElementTree.fromstring(result)
+resultEMS = urllib2.urlopen('https://www.gocolumbiamo.com/PSJC/Services/911/911dispatch/fire_georss.php').read()
+treeEMS = ElementTree.fromstring(resultEMS)
 
+resultPolice = urllib2.urlopen('https://www.gocolumbiamo.com/PSJC/Services/911/911dispatch/police_georss.php').read()
+treePolice = ElementTree.fromstring(resultPolice)
+
+
+def emergencyType(truck):
+    if truck[0] == "M":
+      return "Medical"
+    else:
+      return "Fire"
 
 def getTruckType(truck):
     if truck[:2] == "SN":
@@ -33,7 +42,8 @@ def getStationNum(truck):
     return int(digit) if digit != "" else -1
 
 
-for node in tree.iter('item'):
+for node in treeEMS.iter('item'):
+    emergencyType = getEmergType(node[14])
     pubDate = node[0].text
     title = node[1].text
     desc = node[2].text
@@ -62,6 +72,7 @@ for node in tree.iter('item'):
                  a.callDatalat={callDatalat},
                  a.callDatalong={callDatalong},
                  a.agency={agency},
+                 a.emergencyType={emergencyType},
                  a.FDids={FDids}
                  """, {'in_id':in_id,
                    'pubDate':pubDate,
@@ -76,6 +87,7 @@ for node in tree.iter('item'):
                    'callDatalat':callDatalat,
                    'callDatalong':callDatalong,
                    'agency':agency,
+                   'emergencyType':emergencyType,
                    'FDids':FDids})
     for truck in trucks:
         truckType = getTruckType(truck)
@@ -84,12 +96,57 @@ for node in tree.iter('item'):
                      MERGE (truck:Truck {id: {truck}})
                      set truck.type={truckType}
                      MERGE (truck)-[:Dispatch]->(item)
-                     MERGE (fireStation:FireStation {id:{truckStatNum}})
-                     MERGE (truck)-[:BelongsTo]->(fireStation)
-                     """,{'truck':truck,'in_id':in_id,'truckType':truckType,'truckStatNum':truckStatNum})
+                     """,{'truck':truck,'in_id':in_id})
 
-
-
+for node in treePolice.iter('item'):
+    emergencyType = "Police"
+    pubDate = node[0].text
+    title = node[1].text
+    desc = node[2].text
+    geolat = float(node[3].text)
+    geolong = float(node[4].text)
+    callDateTime = node[5].text
+    address = node[6].text
+    aptLot = node[7].text
+    displayName = node[8].text
+    in_id = node[9].text
+    timestamp = int(node[10].text)
+    callDatalat = float(node[11].text)
+    callDatalong = float(node[12].text)
+    gridLoc = node[13].text
+    disp = node[14].text
+    session.run("""MERGE (a:Item {id: {in_id}})
+             set a.pubDate={pubDate},
+                 a.emergencyType={emergencyType},
+                 a.title={title},
+                 a.desc={desc},
+                 a.geolat={geolat},
+                 a.geolong={geolong},
+                 a.callDateTime={callDateTime},
+                 a.address={address},
+                 a.aptLot={aptLot},
+                 a.displayName={displayName},
+                 a.timestamp={timestamp},
+                 a.callDatalat={callDatalat},
+                 a.callDatalong={callDatalong},
+                 a.gridLoc={gridLoc},
+                 a.disp={disp}
+                 """, {'in_id':in_id,
+                   'pubDate':pubDate,
+                   'title':title,
+                   'desc':desc,
+                   'geolat':geolat,
+                   'geolong':geolong,
+                   'callDateTime':callDateTime,
+                   'address':address,
+                   'aptLot':aptLot,
+                   'displayName':displayName,
+                   'timestamp':timestamp,
+                   'callDatalat':callDatalat,
+                   'callDatalong':callDatalong,
+                   'gridLoc':gridLoc,
+                   'emergencyType':emergencyType,
+                   'disp':disp})
 
 
 #for name, in session.run("MATCH (a:Person) RETURN a.name AS name"):
