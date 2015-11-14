@@ -53,7 +53,6 @@
         }
 
         function setEvents( events ) {
-            console.log( events );
             events.forEach(onCityEvent);
         }
 
@@ -68,7 +67,8 @@
         	   "type": "Feature",
         	         "properties": {
         		       "name": event.title,
-        		       "popupContent": event.desc
+        		       "popupContent": event.desc,
+                   "show_on_map" : true
         	         },
         	  "geometry": {
         		    "type": "Point",
@@ -80,7 +80,16 @@
           //console.log(geojsonFeature)
 
           L.geoJson(geojsonFeature, {
-              onEachFeature: onEachFeature
+              onEachFeature: onEachFeature,
+              filter: function(feature, layer) {
+                return feature.properties.show_on_map;
+              },
+              style: function(feature) {
+                switch (feature.properties.name) {
+                case 'Motor Vehicle Collision': return {color: "#ff0000"};
+                default : return {color: "#0000ff"};
+              }
+            }
           }).addTo(map);
 
           //L.geoJson(geojsonFeature).addTo(map)
@@ -96,7 +105,7 @@
             var center = Date.now() + parseInt(delta) * 1000,
                 start = center - WINDOW_SIZE,
                 end = center - WINDOW_SIZE;
-            
+
             setTimeout( function() {
               document.querySelector("#range-details").innerHTML = moment( end ).calendar();
             }, 0);
@@ -120,10 +129,10 @@
                 }
             },
             onCompleted: function() {
-                setEvents( events );    
+                setEvents( events );
                 setWindow( 0, 1542840729 );
             }
-        }); 
+        });
     </script>
 </body>
 </html>
