@@ -3304,7 +3304,7 @@ var Node = (function () {
   _createClass(Node, [{
     key: "toString",
     value: function toString() {
-      var s = "(" + this.identity.split('/')[1];
+      var s = "(" + this.identity;
       for (var i = 0; i < this.labels.length; i++) {
         s += ":" + this.labels[i];
       }
@@ -5236,7 +5236,9 @@ var WebSocketChannel = (function () {
     };
     this._ws.onmessage = function (event) {
       if (self.onmessage) {
-        self.onmessage(new _buf.HeapBuffer(event.data));
+        var b = new _buf.HeapBuffer(event.data);
+        console.log("RAW: " + b.toHex());
+        self.onmessage(b);
       }
     };
   }
@@ -5304,21 +5306,21 @@ module.exports = exports["default"];
  * limitations under the License.
  */
 
-'use strict';
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var _buf = require('./buf');
 
@@ -5339,10 +5341,10 @@ var Chunker = (function (_buf$BaseBuffer) {
   function Chunker(channel, bufferSize) {
     _classCallCheck(this, Chunker);
 
-    _get(Object.getPrototypeOf(Chunker.prototype), 'constructor', this).call(this, 0);
+    _get(Object.getPrototypeOf(Chunker.prototype), "constructor", this).call(this, 0);
     this._bufferSize = bufferSize || _DEFAULT_BUFFER_SIZE;
     this._ch = channel;
-    this._buffer = _buf2['default'].alloc(this._bufferSize);
+    this._buffer = _buf2["default"].alloc(this._bufferSize);
     this._currentChunkStart = 0;
     this._chunkOpen = false;
   }
@@ -5354,25 +5356,25 @@ var Chunker = (function (_buf$BaseBuffer) {
    */
 
   _createClass(Chunker, [{
-    key: 'putUInt8',
+    key: "putUInt8",
     value: function putUInt8(position, val) {
       this._ensure(1);
       this._buffer.writeUInt8(val);
     }
   }, {
-    key: 'putInt8',
+    key: "putInt8",
     value: function putInt8(position, val) {
       this._ensure(1);
       this._buffer.writeInt8(val);
     }
   }, {
-    key: 'putFloat64',
+    key: "putFloat64",
     value: function putFloat64(position, val) {
       this._ensure(8);
       this._buffer.writeFloat64(val);
     }
   }, {
-    key: 'putBytes',
+    key: "putBytes",
     value: function putBytes(position, data) {
       // TODO: If data is larger than our chunk size or so, we're very likely better off just passing this buffer on rather than doing the copy here
       // TODO: *however* note that we need some way to find out when the data has been written (and thus the buffer can be re-used) if we take that approach
@@ -5388,7 +5390,7 @@ var Chunker = (function (_buf$BaseBuffer) {
       return this;
     }
   }, {
-    key: 'flush',
+    key: "flush",
     value: function flush() {
       if (this._buffer.position > 0) {
         this._closeChunkIfOpen();
@@ -5400,7 +5402,7 @@ var Chunker = (function (_buf$BaseBuffer) {
         this._ch.write(out.getSlice(0, out.position));
 
         // Alloc a new output buffer. We assume we're using NodeJS's buffer pooling under the hood here!
-        this._buffer = _buf2['default'].alloc(this._bufferSize);
+        this._buffer = _buf2["default"].alloc(this._bufferSize);
         this._chunkOpen = false;
       }
       return this;
@@ -5412,7 +5414,7 @@ var Chunker = (function (_buf$BaseBuffer) {
      * any currently open chunk as needed 
      */
   }, {
-    key: 'messageBoundary',
+    key: "messageBoundary",
     value: function messageBoundary() {
 
       this._closeChunkIfOpen();
@@ -5427,7 +5429,7 @@ var Chunker = (function (_buf$BaseBuffer) {
 
     /** Ensure at least the given size is available for writing */
   }, {
-    key: '_ensure',
+    key: "_ensure",
     value: function _ensure(size) {
       var toWriteSize = this._chunkOpen ? size : size + _CHUNK_HEADER_SIZE;
       if (this._buffer.remaining() < toWriteSize) {
@@ -5441,7 +5443,7 @@ var Chunker = (function (_buf$BaseBuffer) {
       }
     }
   }, {
-    key: '_closeChunkIfOpen',
+    key: "_closeChunkIfOpen",
     value: function _closeChunkIfOpen() {
       if (this._chunkOpen) {
         var chunkSize = this._buffer.position - (this._currentChunkStart + _CHUNK_HEADER_SIZE);
@@ -5452,7 +5454,7 @@ var Chunker = (function (_buf$BaseBuffer) {
   }]);
 
   return Chunker;
-})(_buf2['default'].BaseBuffer);
+})(_buf2["default"].BaseBuffer);
 
 var Dechunker = (function () {
   function Dechunker() {
@@ -5464,7 +5466,7 @@ var Dechunker = (function () {
   }
 
   _createClass(Dechunker, [{
-    key: 'AWAITING_CHUNK',
+    key: "AWAITING_CHUNK",
     value: function AWAITING_CHUNK(buf) {
       if (buf.remaining() >= 2) {
         // Whole header available, read that
@@ -5476,13 +5478,13 @@ var Dechunker = (function () {
       }
     }
   }, {
-    key: 'IN_HEADER',
+    key: "IN_HEADER",
     value: function IN_HEADER(buf) {
       // First header byte read, now we read the next one
       return this._onHeader((this._partialChunkHeader | buf.readUInt8()) & 0xFFFF);
     }
   }, {
-    key: 'IN_CHUNK',
+    key: "IN_CHUNK",
     value: function IN_CHUNK(buf) {
       if (this._chunkSize <= buf.remaining()) {
         // Current packet is larger than current chunk, or same size:
@@ -5496,14 +5498,14 @@ var Dechunker = (function () {
       }
     }
   }, {
-    key: 'CLOSED',
+    key: "CLOSED",
     value: function CLOSED(buf) {}
     // no-op
 
     /** Called when a complete chunk header has been recieved */
 
   }, {
-    key: '_onHeader',
+    key: "_onHeader",
     value: function _onHeader(header) {
       if (header == 0) {
         // Message boundary
@@ -5511,9 +5513,10 @@ var Dechunker = (function () {
         if (this._currentMessage.length == 1) {
           message = this._currentMessage[0];
         } else {
-          message = new _buf2['default'].CombinedBuffer(this._currentMessage);
+          message = new _buf2["default"].CombinedBuffer(this._currentMessage);
         }
         this._currentMessage = [];
+        console.log("MESSAGE: ", message.toHex());
         this.onmessage(message);
         return this.AWAITING_CHUNK;
       } else {
@@ -5522,7 +5525,7 @@ var Dechunker = (function () {
       }
     }
   }, {
-    key: 'write',
+    key: "write",
     value: function write(buf) {
       while (buf.hasRemaining()) {
         this._state = this._state(buf);
@@ -5533,11 +5536,11 @@ var Dechunker = (function () {
   return Dechunker;
 })();
 
-exports['default'] = {
+exports["default"] = {
   Chunker: Chunker,
   Dechunker: Dechunker
 };
-module.exports = exports['default'];
+module.exports = exports["default"];
 
 },{"./buf":7}],11:[function(require,module,exports){
 /**
@@ -5592,6 +5595,8 @@ var _buf = require("./buf");
 var _graphTypes = require('../graph-types');
 
 var _graphTypes2 = _interopRequireDefault(_graphTypes);
+
+var _integer = require('../integer');
 
 var Channel = undefined;
 if (_chWebsocket2["default"].available) {
@@ -5653,6 +5658,7 @@ var NO_OP_OBSERVER = {
 /** Maps from packstream structures to Neo4j domain objects */
 var _mappers = {
   node: function node(unpacker, buf) {
+    console.log("Unpack Node from ", buf, buf.toHex());
     return new _graphTypes2["default"].Node(unpacker.unpack(buf), // Identity
     unpacker.unpack(buf), // Labels
     unpacker.unpack(buf) // Properties
@@ -5928,7 +5934,7 @@ exports["default"] = {
 };
 module.exports = exports["default"];
 
-},{"../graph-types":5,"./buf":7,"./ch-node":8,"./ch-websocket":9,"./chunking":10,"./packstream":13}],12:[function(require,module,exports){
+},{"../graph-types":5,"../integer":6,"./buf":7,"./ch-node":8,"./ch-websocket":9,"./chunking":10,"./packstream":13}],12:[function(require,module,exports){
 /**
  * Copyright (c) 2002-2015 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]

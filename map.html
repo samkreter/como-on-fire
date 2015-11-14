@@ -62,21 +62,28 @@
           }
         }
 
+        var allEvents = [];
+        var currentWindow = [0, 1000000000];
+        var renderedWindow = currentWindow;
+
         function setEvents( events ) {
-            events.forEach(onCityEvent);
+            allEvents = events;
         }
 
         function setWindow( startTimestamp, endTimestamp ) {
-            // loop through each of the global map layers
-            // looking for each geoJson layer
-            map.eachLayer(function (layer) {
-              // get access to the
-              if (layer.feature) {
-                var tempTimestamp = layer.feature.properties.timestamp;
-                // do a if check to verify within timestamp bounds
-              }
-            });
+            currentWindow = [startTimestamp, endTimestamp];
         }
+
+        setInterval( function() {
+            // re-render for current window
+            if(renderedWindow != currentWindow)
+            {
+                allEvents.forEach( function() {
+
+                });
+                renderedWindow = currentWindow;
+            }
+        }, 200);
 
         // Called whenever something happens in town
         function onCityEvent( event ) {
@@ -117,8 +124,13 @@
         function updateRange(delta) {
             var center = Date.now() + parseInt(delta) * 1000,
                 start = center - WINDOW_SIZE,
+<<<<<<< HEAD
                 end = center - WINDOW_SIZE;
 
+=======
+                end = center + WINDOW_SIZE;
+            
+>>>>>>> Debounce
             setTimeout( function() {
               document.querySelector("#range-details").innerHTML = moment( end ).calendar();
             }, 0);
@@ -139,6 +151,8 @@
             onNext:function( record ) {
                 if( !neo4j.isInt( record.n.properties ) ) {
                     events.push( record.n.properties );
+                } else {
+                    console.log( "BAD: " + record.n )
                 }
             },
             onCompleted: function() {
