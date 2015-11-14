@@ -13,7 +13,7 @@
     <div id="map" style="width: 1200px; height: 800px"></div>
 
     <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
-    <script src="neo4j.js"></script>
+    <script src="neo4j-web.js"></script>
 
     <script>
         var cities = new L.LayerGroup();
@@ -52,7 +52,7 @@
           if (feature.properties && feature.properties.popupContent) {
             layer.bindPopup(feature.properties.popupContent);
           }
-      }
+        }
 
         // Called whenever something happens in town
         function onCityEvent( event ) {
@@ -61,11 +61,11 @@
         	   "type": "Feature",
         	         "properties": {
         		       "name": event.title,
-        		       "popupContent": event.description
+        		       "popupContent": event.desc
         	         },
         	  "geometry": {
         		    "type": "Point",
-        		    "coordinates": [event.lon, event.lat]
+        		    "coordinates": [event.geolong, event.geolat]
         	  }
           }
           //console.log(geojsonFeature)
@@ -86,19 +86,15 @@
         // Neo4j connection, putting this in a separate script block so we can easily break it into
         // a separate file later..
 
-        onCityEvent( {
-          lat : 38.9540289,
-          lon : -92.3320246,
-          description : "EVERYTHING IS ON FIRE",
-          title : "OH GOD PLEASE NO",
-          agency: "OpenDataHackathon"
-        } );
-        //var driver = neo4j.driver("neo4j://52.1.232.106");
-        //var session = driver.session();
-//
-        //session.run("MATCH (n) RETURN n").then( function( res ) {
-        //    console.log(res);
-        //});
+        var driver = neo4j.driver("neo4j://52.1.232.106");
+        var session = driver.session();
+
+        session.run("MATCH (n:Item) RETURN n").subscribe( {
+            onNext:function( record ) { 
+                console.log( record.n.properties );
+                onCityEvent( record.n.properties );
+            }
+        }); 
     </script>
 </body>
 </html>
