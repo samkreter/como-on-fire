@@ -24,7 +24,8 @@ for node in tree.iter('item'):
     callDatalong = node[11].text
     agency = node[12].text
     FDids = node[13].text
-    trucks = node[14].text
+    trucks = node[14].text.split(" - ")
+    print trucks
     session.run("""MERGE (a:Item {id: {in_id}})
              set a.pubDate={pubDate},
                  a.title={title},
