@@ -47,17 +47,35 @@
             "Cities": cities
         };
 
+        function onEachFeature(feature, layer) {
+          // does this feature have a property named popupContent?
+          if (feature.properties && feature.properties.popupContent) {
+            layer.bindPopup(feature.properties.popupContent);
+          }
+      }
+
         // Called whenever something happens in town
-        function onCityEvent( event )
-        {
-            // event {
-            //   description
-            //   title
-            //   agency
-            //   lat
-            //   lon
-            // }
-            L.circle([event.lat, event.lon], 200).addTo(map);
+        function onCityEvent( event ) {
+          console.log("DID WE CALL THIS")
+          var geojsonFeature = {
+        	   "type": "Feature",
+        	         "properties": {
+        		       "name": event.title,
+        		       "popupContent": event.description
+        	         },
+        	  "geometry": {
+        		    "type": "Point",
+        		    "coordinates": [event.lon, event.lat]
+        	  }
+          }
+          //console.log(geojsonFeature)
+
+          L.geoJson(geojsonFeature, {
+              onEachFeature: onEachFeature
+          }).addTo(map);
+
+          //L.geoJson(geojsonFeature).addTo(map)
+          //L.circle([event.lat, event.lon], 200).addTo(map);
         }
 
         L.control.layers(baseLayers, overlays).addTo(map);
@@ -69,7 +87,7 @@
         // a separate file later..
 
         onCityEvent( {
-          lat : 38.9540289, 
+          lat : 38.9540289,
           lon : -92.3320246,
           description : "EVERYTHING IS ON FIRE",
           title : "OH GOD PLEASE NO",
@@ -78,7 +96,7 @@
         //var driver = neo4j.driver("neo4j://52.1.232.106");
         //var session = driver.session();
 //
-        //session.run("MATCH (n) RETURN n").then( function( res ) { 
+        //session.run("MATCH (n) RETURN n").then( function( res ) {
         //    console.log(res);
         //});
     </script>
