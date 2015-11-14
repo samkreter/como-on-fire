@@ -88,7 +88,7 @@ for node in treeEMS.iter('item'):
                    'callDatalat':callDatalat,
                    'callDatalong':callDatalong,
                    'agency':agency,
-                   'emergencyType':emergencyMarker
+                   'emergencyType':emergencyMarker,
                    'FDids':FDids})
     for truck in trucks:
         truckType = getTruckType(truck)
@@ -99,7 +99,7 @@ for node in treeEMS.iter('item'):
                      set truck.type={truckType}
                          truck.emergencyType={emergencyType}
                      MERGE (truck)-[:Dispatch]->(item)
-                     """,{'truck':truck,'in_id':in_id,'emergencyType':emergencyType})
+                     """,{'truck':truck,'truckType':truckType,'in_id':in_id,'emergencyType':emergencyType})
 
 for node in treePolice.find_all('item'):
     emergencyType = "Police"
