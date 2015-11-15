@@ -78,7 +78,7 @@
             // re-render for current window
             if(renderedWindow != currentWindow)
             {
-                allEvents.forEach( function() {
+                allEvents.forEach( function(e) {
 
                 });
                 renderedWindow = currentWindow;
@@ -124,13 +124,9 @@
         function updateRange(delta) {
             var center = Date.now() + parseInt(delta) * 1000,
                 start = center - WINDOW_SIZE,
-<<<<<<< HEAD
-                end = center - WINDOW_SIZE;
 
-=======
                 end = center + WINDOW_SIZE;
-            
->>>>>>> Debounce
+
             setTimeout( function() {
               document.querySelector("#range-details").innerHTML = moment( end ).calendar();
             }, 0);
