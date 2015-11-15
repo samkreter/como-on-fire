@@ -123,14 +123,8 @@
         /** Called whenever the slider is moved by the user */
         function updateRange(delta) {
             var center = Date.now() + parseInt(delta) * 1000,
-                start = center - WINDOW_SIZE,
-<<<<<<< HEAD
-                end = center - WINDOW_SIZE;
-
-=======
+                start = center - WINDOW_SIZE;
                 end = center + WINDOW_SIZE;
-            
->>>>>>> Debounce
             setTimeout( function() {
               document.querySelector("#range-details").innerHTML = moment( end ).calendar();
             }, 0);
@@ -149,11 +143,7 @@
         var events = [];
         session.run("MATCH (n:Item) RETURN n ORDER BY n.timestamp DESC").subscribe( {
             onNext:function( record ) {
-                if( !neo4j.isInt( record.n.properties ) ) {
-                    events.push( record.n.properties );
-                } else {
-                    console.log( "BAD: " + record.n )
-                }
+                events.push( record.n.properties );
             },
             onCompleted: function() {
                 setEvents( events );
